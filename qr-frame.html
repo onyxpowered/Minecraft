@@ -24,13 +24,13 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: transparent;
   var root = document.getElementById("brand-load"), foot = root.querySelector(".ld-foot-r"), link = root.querySelector(".ld-status");
   var setOpen = function (on) {
     foot.classList.toggle("ld-open", on); link.setAttribute("aria-expanded", on ? "true" : "false");
-    try { sessionStorage.setItem("arc:qr", on ? "1" : "0"); } catch (e) {}      // the client reloads this page when it swaps builds
+    try { sessionStorage.setItem("arc:qr", on ? String(Date.now()) : "0"); } catch (e) {}      // the client reloads this page when it swaps builds
   };
   link.addEventListener("pointerdown", function (e) { if (e.button) return; e.preventDefault(); setOpen(!foot.classList.contains("ld-open")); });
   link.addEventListener("click", function (e) { e.preventDefault(); });
   document.addEventListener("pointerdown", function (e) { if (!foot.contains(e.target)) setOpen(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
-  try { if (sessionStorage.getItem("arc:qr") === "1") foot.classList.add("ld-open"); } catch (e) {}
+  try { if (Date.now() - Number(sessionStorage.getItem("arc:qr")) < 8000) foot.classList.add("ld-open"); } catch (e) {}     // only across a build swap, not a later visit
   window.addEventListener("message", function (e) {
     if (e.source !== parent) return;
     if (e.data === "arc-in") { root.classList.add("ld-in"); parent.postMessage("arc-shown", "*"); }
