@@ -57,7 +57,9 @@ function ldWire(root) {
   const foot = root.querySelector(".ld-foot-r"), link = root.querySelector(".ld-status");
   if (!foot || !link) return;
   function setOpen(on) { foot.classList.toggle("ld-open", on); link.setAttribute("aria-expanded", on ? "true" : "false"); }
-  link.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); setOpen(!foot.classList.contains("ld-open")); });
+  // Toggles on pointerdown so the popup answers the press itself, not the release; the click that follows only has its default (following the link) cancelled.
+  link.addEventListener("pointerdown", function (e) { if (e.button) return; e.preventDefault(); e.stopPropagation(); setOpen(!foot.classList.contains("ld-open")); });
+  link.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); });
   root.addEventListener("click", function (e) { if (!foot.contains(e.target)) setOpen(false); });
   document.addEventListener("keydown", function esc(e) { if (!root.isConnected) return document.removeEventListener("keydown", esc); if (e.key === "Escape") setOpen(false); });
 }

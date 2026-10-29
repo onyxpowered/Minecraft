@@ -42,6 +42,17 @@
 })();
 </script></head><body style="position:fixed;inset:0;margin:0;width:100%;height:100%;overflow:hidden;background:#000">__COVER__<script>
 // The cover, tab title and icon are shown from the first bytes; the build below only starts once it has all arrived.
+function ldWire(root) {
+  const foot = root.querySelector(".ld-foot-r"), link = root.querySelector(".ld-status");
+  if (!foot || !link) return;
+  function setOpen(on) { foot.classList.toggle("ld-open", on); link.setAttribute("aria-expanded", on ? "true" : "false"); }
+  // Toggles on pointerdown so the popup answers the press itself, not the release; the click that follows only has its default (following the link) cancelled.
+  link.addEventListener("pointerdown", function (e) { if (e.button) return; e.preventDefault(); e.stopPropagation(); setOpen(!foot.classList.contains("ld-open")); });
+  link.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); });
+  root.addEventListener("click", function (e) { if (!foot.contains(e.target)) setOpen(false); });
+  document.addEventListener("keydown", function esc(e) { if (!root.isConnected) return document.removeEventListener("keydown", esc); if (e.key === "Escape") setOpen(false); });
+}
+ldWire(document.getElementById("brand-load"));
 setTimeout(function () { var c = document.getElementById("brand-load"); if (c) { c.classList.add("ld-in"); window.__arcLauncher.shown = true; } }, 500);
 </script><script type="text/plain" id="arc-embedded">__EMBEDDED__</script><script>
 (function () {
