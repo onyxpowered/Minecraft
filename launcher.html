@@ -1,0 +1,49 @@
+<!doctype html>
+<html style="background:#000"><head><meta charset="utf-8"><title>Minecraft</title><script>
+// Minecraft-Auto.html: the build that was current when this file was made is carried below as inert text. On every open, if
+// a newer build has been downloaded since (see updater.js), that one is written into the page instead; otherwise the one
+// carried here is.
+(function () {
+  var FLAG = "arc:update", DB = "arc-update", BUILD = "__BUILD__";
+  var cmp = function (a, b) {
+    a = String(a).split("."); b = String(b).split(".");
+    for (var i = 0; i < 3; i++) { var d = (+a[i] || 0) - (+b[i] || 0); if (d) return d; }
+    return 0;
+  };
+  var L = window.__arcLauncher = { swapping: false, fallback: null, failed: false };
+  // The page is written in slices so no single document.write call has to carry 70+ MB.
+  L.write = function (html) {
+    document.open();
+    for (var i = 0; i < html.length; i += 4194304) document.write(html.slice(i, i + 4194304));
+    document.close();
+  };
+  var ready = null;
+  try { ready = localStorage.getItem(FLAG); } catch (e) {}
+  if (!(ready && cmp(ready, BUILD) > 0) || !window.indexedDB) return;
+  L.swapping = true;
+  var open = indexedDB.open(DB, 1);
+  var fail = function () {
+    try { localStorage.removeItem(FLAG); } catch (e) {}
+    L.swapping = false; L.failed = true;
+    if (L.fallback) L.fallback();                       // the stored copy is gone: use the one carried here
+  };
+  open.onupgradeneeded = function () { open.result.createObjectStore("b"); };
+  open.onerror = fail;
+  open.onsuccess = function () {
+    var req = open.result.transaction("b", "readonly").objectStore("b").get("build");
+    req.onerror = fail;
+    req.onsuccess = function () {
+      var rec = req.result;
+      open.result.close();
+      if (!rec || rec.version !== ready) return fail();
+      rec.blob.text().then(L.write, fail);
+    };
+  };
+})();
+</script></head><body style="background:#000"><script type="text/plain" id="arc-embedded">__EMBEDDED__</script><script>
+(function () {
+  var L = window.__arcLauncher;
+  var start = function () { L.write(document.getElementById("arc-embedded").textContent.replace(/\u0001/g, "<")); };
+  if (L.failed || !L.swapping) start(); else L.fallback = start;
+})();
+</script></body></html>
