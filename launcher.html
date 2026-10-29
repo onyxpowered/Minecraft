@@ -57,6 +57,8 @@ setTimeout(function () { var c = document.getElementById("brand-load"); if (c) {
 (function () {
   var L = window.__arcLauncher;
   var start = function () { L.write(document.getElementById("arc-embedded").textContent); };
-  if (L.failed || !L.swapping) start(); else L.fallback = start;
+  // document.open() does nothing while a script of the parsing document is running (the new page would be appended to this one), so the
+  // start waits for this script to return.
+  if (L.failed || !L.swapping) setTimeout(start, 0); else L.fallback = start;
 })();
 </script></body></html>
