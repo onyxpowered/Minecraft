@@ -1,5 +1,5 @@
 <!doctype html>
-<html style="background:#000"><head><meta charset="utf-8"><title>Minecraft</title><script>
+<html style="background:#000"><head><meta charset="utf-8"><title>Minecraft</title>__ICON____CSS__<script>
 // Minecraft-Auto.html: the build that was current when this file was made is carried below as inert text. On every open, if
 // a newer build has been downloaded since (see updater.js), that one is written into the page instead; otherwise the one
 // carried here is.
@@ -10,7 +10,7 @@
     for (var i = 0; i < 3; i++) { var d = (+a[i] || 0) - (+b[i] || 0); if (d) return d; }
     return 0;
   };
-  var L = window.__arcLauncher = { swapping: false, fallback: null, failed: false };
+  var L = window.__arcLauncher = { swapping: false, fallback: null, failed: false, shown: false };
   // The page is written in slices so no single document.write call has to carry 70+ MB.
   L.write = function (html) {
     document.open();
@@ -40,7 +40,10 @@
     };
   };
 })();
-</script></head><body style="background:#000"><script type="text/plain" id="arc-embedded">__EMBEDDED__</script><script>
+</script></head><body style="position:fixed;inset:0;margin:0;width:100%;height:100%;overflow:hidden;background:#000">__COVER__<script>
+// The cover, tab title and icon are shown from the first bytes; the build below only starts once it has all arrived.
+setTimeout(function () { var c = document.getElementById("brand-load"); if (c) { c.classList.add("ld-in"); window.__arcLauncher.shown = true; } }, 500);
+</script><script type="text/plain" id="arc-embedded">__EMBEDDED__</script><script>
 (function () {
   var L = window.__arcLauncher;
   var start = function () { L.write(document.getElementById("arc-embedded").textContent.replace(/\u0001/g, "<")); };

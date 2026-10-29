@@ -30,9 +30,19 @@ built = html[:at + len(anchor)] + '<script>' + script + '</script>' + html[at + 
 body = built.encode('latin1')
 assert b'\x01' not in body, 'the page already contains \\x01'
 launcher = open(os.path.join(here, 'launcher.html'), encoding='utf-8').read().replace('__BUILD__', version)
+# the launcher shows the build's own cover, icon and title from its first bytes, so those are cut out of the build
+text = built
+css_at = text.index('<style>#brand-load')
+css = text[css_at:text.index('</style>', css_at) + 8]
+import re
+icon = re.search(r'<link rel="icon"[^>]*>', text[:60000]).group(0)
+cover_at = text.index("coverElement = ACCR('") + len("coverElement = ACCR('")
+cover = text[cover_at:text.index("');\n", cover_at)]
+assert "'" not in cover
+launcher = launcher.replace('__ICON__', icon).replace('__CSS__', css).replace('__COVER__', cover)
 head, tail = launcher.split('__EMBEDDED__')
 auto = os.path.join(here, 'Minecraft-Auto.html')
-open(auto, 'wb').write(head.encode('utf-8') + body.replace(b'<', b'\x01') + tail.encode('utf-8'))
+open(auto, 'wb').write(head.encode('latin1') + body.replace(b'<', b'\x01') + tail.encode('latin1'))
 
 blob = gzip.compress(built.encode('latin1'), 9, mtime=0)
 dist = os.path.join(here, 'dist')

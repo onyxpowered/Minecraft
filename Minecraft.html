@@ -43,6 +43,8 @@ function AARCC() {
   if (!coverElement || introShown) return; introShown = true;
   // The logo, bar and corner text appear together: 0.5 s after the cover, and only once the logo image is decoded.
   const cover = coverElement, img = cover.querySelector(".ld-logo img"), t0 = performance.now();
+  // Minecraft-Auto.html already showed this cover (and faded it in) while the page was still arriving: carry on from there.
+  if (window.__arcLauncher && window.__arcLauncher.shown) { introAt = t0; cover.classList.add("ld-in"); return; }
   introAt = t0 + 500;
   const decoded = img && img.decode ? img.decode().catch(function () {}) : Promise.resolve();
   Promise.race([decoded, new Promise(function (r) { setTimeout(r, 1500); })]).then(function () {
