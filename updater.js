@@ -4,7 +4,7 @@
 // for the next open. (Minecraft-Auto.html, the launcher around this page, is what loads a stored build in place of its own.)
 (function () {
   var REPO = "onyxpowered/Minecraft", BUILD = "__BUILD__", FLAG = "arc:update", DB = "arc-update";
-  var CDN = "https://cdn.jsdelivr.net/gh/" + REPO, API = "https://data.jsdelivr.com/v1/packages/gh/" + REPO;
+  var CDN = "https://cdn.jsdelivr.net/gh/" + REPO;
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;   // the game later replaces fetch with a filtered one
 
   var cmp = function (a, b) {
@@ -34,7 +34,7 @@
 
   // Runs once the page has had time to load, so the check never competes with the game starting.
   var check = function () {
-    getJSON(API + "/resolved?specifier=*").then(function (found) {
+    getJSON(CDN + "@latest/version.json").then(function (found) {
       var latest = found && found.version;
       if (!latest || cmp(latest, BUILD) <= 0 || (ready && cmp(latest, ready) <= 0)) return;
       return getJSON(CDN + "@" + latest + "/version.json").then(function (info) {

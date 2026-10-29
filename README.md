@@ -11,6 +11,7 @@ The Minecraft client for Arc, as one HTML file.
 python3 build.py 1.0.1        # builds Minecraft-Auto.html, dist/ and version.json from Minecraft.html
 git add -A && git commit -m "1.0.1"
 git tag v1.0.1 && git push && git push --tags
+curl https://purge.jsdelivr.net/gh/onyxpowered/Minecraft@latest/version.json     # jsDelivr caches @latest for up to 12 hours; this makes it see the new tag now
 ```
 
 jsDelivr will not serve a GitHub file over 20 MB, so the release is stored as `dist/part-N.bin`, a gzip of the whole page cut into 12 MB pieces. `version.json` lists the pieces and their checksum.
