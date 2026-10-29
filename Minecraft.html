@@ -364,7 +364,13 @@ let CCRR = false;
 try { CCRR = !localStorage.getItem(CCRA); } catch (CA) {}
 if (CCRR) {
   const CCRC = function () {
-    try { RCCA.call(localStorage); RCC.call(localStorage, CCRA, "1"); sessionStorage.clear(); } catch (CA) {}
+    try {
+      // The hidden secret is this browser's identity with the server (it proves the name is its own), not a cache: it is kept.
+      const secret = localStorage.getItem(RAAA);
+      RCCA.call(localStorage);
+      if (secret) RCC.call(localStorage, RAAA, secret);
+      RCC.call(localStorage, CCRA, "1"); sessionStorage.clear();
+    } catch (CA) {}
     location.reload();
   };
   const wipeExtra = Promise.all([
