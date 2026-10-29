@@ -11,10 +11,18 @@
     return 0;
   };
   var L = window.__arcLauncher = { swapping: false, fallback: null, failed: false, shown: false };
-  // The page is written in slices so no single document.write call has to carry 70+ MB.
+  // The page is written in 4 MB slices so no single document.write call has to carry 70+ MB (and never split a surrogate pair). It must
+  // be written without pauses: the parser re-reads the big script blocks it is inside of at every call, so pausing makes it crawl.
+  // Pages carried here have "<" stored as \u0001; that is undone per slice.
   L.write = function (html) {
     document.open();
-    for (var i = 0; i < html.length; i += 4194304) document.write(html.slice(i, i + 4194304));
+    var STEP = 4194304;
+    for (var i = 0; i < html.length;) {
+      var end = Math.min(html.length, i + STEP), last = html.charCodeAt(end - 1);
+      if (end < html.length && last >= 0xD800 && last <= 0xDBFF) end++;
+      document.write(html.slice(i, end).replace(/\u0001/g, "<"));
+      i = end;
+    }
     document.close();
   };
   var ready = null;
@@ -57,7 +65,7 @@ setTimeout(function () { var c = document.getElementById("brand-load"); if (c) {
 </script><script type="text/plain" id="arc-embedded">__EMBEDDED__</script><script>
 (function () {
   var L = window.__arcLauncher;
-  var start = function () { L.write(document.getElementById("arc-embedded").textContent.replace(/\u0001/g, "<")); };
+  var start = function () { L.write(document.getElementById("arc-embedded").textContent); };
   if (L.failed || !L.swapping) start(); else L.fallback = start;
 })();
 </script></body></html>

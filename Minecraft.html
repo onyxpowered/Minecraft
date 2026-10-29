@@ -63,6 +63,19 @@ function ldWire(root) {
   root.addEventListener("click", function (e) { if (!foot.contains(e.target)) setOpen(false); });
   document.addEventListener("keydown", function esc(e) { if (!root.isConnected) return document.removeEventListener("keydown", esc); if (e.key === "Escape") setOpen(false); });
 }
+// Starting the game is one long synchronous task, during which the page cannot react to anything. Holds that start until the cover has
+// finished fading in and nobody has pressed anything for 0.8 s (but never longer than 4 s), so the Status popup can be opened and has
+// finished animating (the animation itself runs on the compositor and carries on while the page is busy).
+window.__arcHold = function (go) {
+  const t0 = performance.now(); let last = 0;
+  addEventListener("pointerdown", function () { last = performance.now(); }, true);
+  (function wait() {
+    const now = performance.now();
+    const settled = introShown ? now >= introAt + 450 : now - t0 > 900;
+    if ((settled && now - last > 800) || now - t0 > 4000) return setTimeout(go, 0);
+    setTimeout(wait, 100);
+  })();
+};
 function RACR() {
   if (!coverElement || introHolding || !bootReady) return;
   const RAA = coverElement; coverElement = null; CCA = 100;
@@ -2330,8 +2343,9 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 					setTimeout(poll, 150);
 				})();
 
-				// Let the early-load layer paint before synchronous startup.
-				setTimeout(() => {
+				// Let the early-load layer paint before synchronous startup. (Starting Java blocks the page for a couple of seconds, so
+				// the cover's Status link gets a chance to be used first: see __arcHold.)
+				(window.__arcHold || function (go) { setTimeout(go, 60); })(() => {
 					try {
 						window.__eaglerCrashJournal.stage("java-main");
 						main([]);
@@ -2341,7 +2355,7 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 						console.error("SHELL_ERR " + window.__err + (e && e.stack ? "\n" + e.stack : ""));
 						window.__eaglerShowShellCrash(e);
 					}
-				}, 60);
+				});
 			} catch (e) {
 				window.__err = (e && (e.name + ": " + e.message)) || String(e);
 				console.error("SHELL_ERR " + window.__err + (e && e.stack ? "\n" + e.stack : ""));
