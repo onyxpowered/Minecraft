@@ -39,7 +39,8 @@ icon = re.search(r'<link rel="icon"[^>]*>', text[:60000]).group(0)
 cover_at = text.index("coverElement = ACCR('") + len("coverElement = ACCR('")
 cover = text[cover_at:text.index("');\n", cover_at)]
 assert "'" not in cover
-launcher = launcher.replace('__ICON__', icon).replace('__CSS__', css).replace('__COVER__', cover)
+ld_at = text.index('function ldWire(root) {'); ldwire = text[ld_at:text.index('\nfunction RACR()', ld_at)]
+launcher = launcher.replace('__LDWIRE__', ldwire).replace('__ICON__', icon).replace('__CSS__', css).replace('__COVER__', cover)
 head, tail = launcher.split('__EMBEDDED__')
 auto = os.path.join(here, 'Minecraft-Auto.html')
 open(auto, 'wb').write(head.encode('latin1') + body.replace(b'<', b'\x01') + tail.encode('latin1'))

@@ -1,7 +1,7 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "parts": 5,
-  "gzBytes": 57483031,
-  "gzSha256": "155a0e7f1db638352feafa4c80a6a7e2039fc9444e4afd96bcc2444d67ac4559",
-  "htmlBytes": 76556044
+  "gzBytes": 57483193,
+  "gzSha256": "aa7d23d4aaffa225963c5f6d8a8ae8d131c74e3f4b36c227d99e253020a733ad",
+  "htmlBytes": 76556830
 }
